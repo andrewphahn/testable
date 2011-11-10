@@ -1,3 +1,6 @@
+/**
+ * In same package as code you are testing to allow access to protected fields and methods.
+ */
 package com.example.testable.client.presenter;
 
 import static org.mockito.Mockito.verify;
@@ -38,15 +41,23 @@ public class PresenterTest extends Assert implements Module {
 	@Unit
 	PresenterImpl presenter;
 
+	/**
+	 * Override the annotation configuration in the code to inject a mock
+	 * instance.
+	 */
 	@Mock
 	View view;
 
+	/**
+	 * Override the default gin call to GWT.create() to inject a mock instance.
+	 */
 	@Mock
 	GreetingServiceAsync greetingService;
 
 	@Override
-	public void configure(Binder arg0) {
-
+	public void configure(Binder binder) {
+		// Nothing extra to configure. All injection configuration is already
+		// done by annotations in the code or the @Mock annotations above
 	}
 
 	/**
