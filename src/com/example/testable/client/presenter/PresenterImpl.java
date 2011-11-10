@@ -11,6 +11,23 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 @Singleton
 public class PresenterImpl implements Presenter, InteractionHandler {
 
+	protected static final String PLEASE_ENTER_AT_LEAST_FOUR_CHARACTERS = "Please enter at least four characters";
+	protected static final String REMOTE_PROCEDURE_CALL_FAILURE = "Remote Procedure Call - Failure";
+	protected static final String REMOTE_PROCEDURE_CALL = "Remote Procedure Call";
+
+	protected class TextToServerCallback implements AsyncCallback<String> {
+
+		public void onFailure(Throwable caught) {
+			// Show the RPC error message to the user
+			view.onFailure(REMOTE_PROCEDURE_CALL_FAILURE);
+
+		}
+
+		public void onSuccess(String result) {
+			view.onSuccess(REMOTE_PROCEDURE_CALL, result);
+		}
+	}
+
 	@Inject
 	protected View view;
 
@@ -28,26 +45,17 @@ public class PresenterImpl implements Presenter, InteractionHandler {
 	@Override
 	public void sendNameToServer(String textToServer) {
 		// First, we validate the input.
-		view.setErrorLabelText("");
 		if (!FieldVerifier.isValidName(textToServer)) {
-			view.setErrorLabelText("Please enter at least four characters");
+			view.setErrorLabelText(PLEASE_ENTER_AT_LEAST_FOUR_CHARACTERS);
 			return;
+		} else {
+			view.setErrorLabelText("");
 		}
 
 		// Then, we send the input to the server.
 		view.setSendButtonEnabled(false);
 		view.setTextToServerLabelText(textToServer);
 		view.clearServerResponseLabelText();
-		greetingService.greetServer(textToServer, new AsyncCallback<String>() {
-			public void onFailure(Throwable caught) {
-				// Show the RPC error message to the user
-				view.onFailure("Remote Procedure Call - Failure");
-
-			}
-
-			public void onSuccess(String result) {
-				view.onSuccess("Remote Procedure Call", result);
-			}
-		});
+		greetingService.greetServer(textToServer, new TextToServerCallback());
 	}
 }
